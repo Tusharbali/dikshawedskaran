@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+<h2>Scan Guest QR</h2>
+<div id="reader" style="width:300px"></div>
+
+<script>
+new Html5Qrcode("reader").start(
+  { facingMode: "environment" },
+  { fps:10, qrbox:250 },
+  qr => {
+    fetch('../api/mark_attend.php?id='+qr)
+    .then(r=>r.text())
+    .then(alert);
+  }
+);
+</script>
+</body>
+</html>

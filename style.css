@@ -1,0 +1,201 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins}
+body{background:#fff;overflow-x:hidden}
+
+/* Curtain */
+#intro{
+  position:fixed;
+  inset:0;
+  z-index:999;
+}
+
+.curtain{
+  position:absolute;
+  width:50%;
+  height:100%;
+  background:linear-gradient(45deg,#ff4f81,#9c27b0);
+  transition:1.8s ease;
+}
+
+.left{left:0}
+.right{right:0}
+
+#intro.open .left{transform:translateX(-100%)}
+#intro.open .right{transform:translateX(100%)}
+
+.intro-box{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(45deg,#ffe3ec,#f5d9ff);
+}
+
+.intro-box h1{
+  font-family:Great Vibes;
+  font-size:70px;
+  color:#b12db5;
+}
+
+.intro-box button{
+  margin-top:20px;
+  padding:15px 40px;
+  border:none;
+  background:#ff4f81;
+  color:white;
+  font-size:20px;
+  border-radius:30px;
+}
+
+/* Hero */
+.hero{
+  height:100vh;
+  background:url('https://i.imgur.com/LsJ8zmd.jpg') center/cover fixed no-repeat;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.4);
+}
+
+.hero-content{
+  color:white;
+  text-align:center;
+  z-index:1;
+}
+
+.hero-content h1{
+  font-family:Great Vibes;
+  font-size:90px;
+}
+
+.counter{
+  margin-top:10px;
+  font-size:18px;
+}
+
+/* Sections */
+section{padding:70px 15px;text-align:center}
+
+h2{
+  font-size:50px;
+  font-family:Great Vibes;
+  color:#b12db5;
+  margin-bottom:30px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
+  transition:.4s;
+}
+
+.card:hover{transform:translateY(-10px) scale(1.05)}
+
+.highlight{
+  background:linear-gradient(45deg,#ff4f81,#9c27b0);
+  color:white;
+}
+
+/* Gallery */
+.slider{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+}
+
+.slider img{
+  height:250px;
+  border-radius:20px;
+}
+
+/* RSVP */
+input,select,button{
+  padding:12px;
+  border-radius:30px;
+  border:1px solid #ccc;
+  width:90%;
+  max-width:350px;
+  margin:10px;
+}
+
+#preview{
+  width:140px;
+  margin:10px;
+  border-radius:15px;
+  display:none;
+}
+
+button{
+  background:#ff4f81;
+  color:white;
+  border:none;
+}
+
+.music-btn{
+  position:fixed;
+  bottom:15px;
+  right:15px;
+  background:#ff4f81;
+  border:none;
+  font-size:25px;
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  color:white;
+}
+
+/* Fade */
+.fade{
+  opacity:0;
+  transform:translateY(40px);
+  transition:1s;
+}
+
+.fade.show{
+  opacity:1;
+  transform:none;
+}
+
+/* Petals */
+.petals span{
+  position:fixed;
+  width:15px;
+  height:15px;
+  background:pink;
+  border-radius:50%;
+  opacity:.6;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  0%{transform:translateY(-10vh) rotate(0deg)}
+  100%{transform:translateY(110vh) rotate(360deg)}
+}
+
+/* Confetti */
+#confetti{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1000;
+}
+
+footer{
+  padding:20px;
+  background:#fce4ff;
+}

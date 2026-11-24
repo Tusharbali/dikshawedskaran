@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Wedding Invitation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --pink:#ff4d8d;
+  --purple:#7b2cff;
+  --gold:#d4af37;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Playfair Display',serif;
+  background:linear-gradient(135deg,#fff0f7,#fde2f3);
+  overflow-x:hidden;
+}
+
+/* OM */
+.om{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:2.5rem;
+  color:var(--gold);
+  z-index:999;
+  animation:glow 3s infinite alternate;
+}
+
+@keyframes glow{
+  from{text-shadow:0 0 6px gold}
+  to{text-shadow:0 0 22px gold}
+}
+
+/* Curtain */
+#intro{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle,#ff9ac7,#7b2cff);
+  z-index:9999;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.curtain{
+  position:absolute;
+  width:50%;
+  height:100%;
+  background:linear-gradient(135deg,#ff4d8d,#7b2cff);
+  transition:2.8s cubic-bezier(.77,0,.175,1);
+}
+
+.left{left:0}
+.right{right:0}
+
+#intro.open .left{transform:translateX(-110%)}
+#intro.open .right{transform:translateX(110%)}
+
+.intro-text{text-align:center;color:white;z-index:5}
+.intro-text h1{font-family:'Great Vibes',cursive;font-size:4rem}
+.intro-text button{
+  padding:14px 36px;
+  border:none;
+  border-radius:30px;
+  font-size:1.1rem;
+  background:white;
+  color:var(--pink);
+  cursor:pointer;
+}
+
+/* Music */
+.music-btn{
+  position:fixed;
+  bottom:15px;
+  right:15px;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:white;
+  font-size:1.4rem;
+  border:none;
+  z-index:999;
+}
+
+/* Hero */
+.hero{
+  min-height:100vh;
+  background:url('https://images.unsplash.com/photo-1529333166437-7750a6dd5a70') center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  color:white;
+  text-align:center;
+}
+
+.hero::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+}
+
+.hero-content{position:relative;z-index:2}
+.names{font-family:'Great Vibes',cursive;font-size:4.6rem}
+
+/* Sections */
+section{padding:80px 18px;text-align:center}
+h2{font-family:'Great Vibes',cursive;font-size:3rem;color:var(--purple)}
+
+/* Story */
+.story{
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  flex-wrap:wrap;
+}
+
+.story-box{
+  width:260px;
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+  animation:fadeUp 1.6s forwards;
+}
+
+.story-box img{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  border:4px solid var(--pink);
+}
+
+.love-text{
+  max-width:800px;
+  margin:30px auto 0;
+  font-size:1.05rem;
+  line-height:1.8;
+  animation:fadeUp 2s forwards;
+}
+
+/* Events */
+.event-grid{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:18px;
+}
+
+.event{
+  width:230px;
+  background:white;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+/* Blessings */
+.bless{
+  max-width:800px;
+  margin:auto;
+  background:white;
+  border-radius:22px;
+  padding:30px;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+/* Map */
+.map-box{
+  max-width:850px;
+  margin:auto;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+/* RSVP */
+form{
+  max-width:450px;
+  margin:auto;
+  background:white;
+  padding:28px;
+  border-radius:22px;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;
+  color:white;
+  font-size:1rem;
+}
+
+/* QR */
+#qrWrap{display:none;margin-top:20px}
+
+/* Petals */
+.petal{
+  position:fixed;
+  width:12px;
+  height:12px;
+  background:radial-gradient(circle,#ffb6d5,#ff69b4);
+  border-radius:50% 0 50% 50%;
+  transform:rotate(45deg);
+  opacity:.7;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  0%{transform:translateY(-10vh)}
+  100%{transform:translateY(110vh)}
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+footer{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:white;
+  padding:22px;
+  text-align:center;
+}
+
+@media(max-width:768px){
+  .names{font-size:3.2rem}
+}
+</style>
+</head>
+
+<body>
+
+<div class="om">ॐ</div>
+
+<div id="intro">
+  <div class="curtain left"></div>
+  <div class="curtain right"></div>
+  <div class="intro-text">
+    <h1>You're Invited</h1>
+    <button onclick="openCurtain()">Open Invitation</button>
+  </div>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="wedding_song.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music-btn" onclick="toggleMusic()">🎵</button>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="names">Aarav & Diya</h1>
+    <p>December 12, 2026 • Udaipur</p>
+  </div>
+</section>
+
+<section>
+  <h2>Our Story</h2>
+  <div class="story">
+    <div class="story-box">
+      <img src="https://i.imgur.com/vpR5U1Y.jpg">
+      <h3>Aarav</h3>
+    </div>
+    <div class="story-box">
+      <img src="https://i.imgur.com/5uW1KjM.jpg">
+      <h3>Diya</h3>
+    </div>
+  </div>
+  <p class="love-text">
+  Love is not just about finding the right person, but creating the right relationship.
+  It’s about how much love you build until the end.
+  We are starting our forever and want you to be part of it.
+  </p>
+</section>
+
+<section>
+  <h2>Wedding Events</h2>
+  <div class="event-grid">
+    <div class="event">Engagement<br>Dec 10 • 7PM</div>
+    <div class="event">Mehendi<br>Dec 11 • 11AM</div>
+    <div class="event">Sangeet<br>Dec 11 • 8PM</div>
+    <div class="event">Wedding<br>Dec 12 • 5PM</div>
+  </div>
+</section>
+
+<section>
+  <h2>Blessings From</h2>
+  <div class="bless">
+    <h3>Groom's Parents</h3>
+    <p>Mr. Rajesh Sharma & Mrs. Sunita Sharma</p>
+    <h3>Bride's Parents</h3>
+    <p>Mr. Ramesh Verma & Mrs. Kavita Verma</p>
+    <h3>Grandparents</h3>
+    <p>With love & blessings</p>
+  </div>
+</section>
+
+<section>
+  <h2>Location</h2>
+  <div class="map-box">
+    <iframe src="https://maps.google.com/maps?q=udaipur&t=&z=13&ie=UTF8&iwloc=&output=embed"
+    width="100%" height="350"></iframe>
+  </div>
+</section>
+
+<section>
+  <h2 id="greet"></h2>
+  <form onsubmit="return submitRSVP()">
+    <input type="text" id="name" placeholder="Full Name" required oninput="greet(this.value)">
+    <input type="email" id="email" placeholder="Email">
+    <input type="tel" id="mobile" placeholder="Mobile Number" required>
+    <select id="attending" required>
+      <option value="">Attending</option>
+      <option>Joyfully Accepts</option>
+      <option>Regretfully Declines</option>
+    </select>
+    <input type="file" accept="image/*">
+    <button>Send Confirmation</button>
+
+    <div id="qrWrap">
+      <h3>Scan & Share</h3>
+      <img id="qrCode">
+    </div>
+  </form>
+</section>
+
+<footer>
+  Made with ❤️ for our Royal Wedding
+</footer>
+
+<script>
+const intro = document.getElementById('intro');
+const bgMusic = document.getElementById('bgMusic');
+
+function openCurtain(){
+  intro.classList.add('open');
+  bgMusic.play();
+  petals();
+  setTimeout(()=>intro.style.display='none',2500);
+}
+
+function toggleMusic(){
+  bgMusic.paused?bgMusic.play():bgMusic.pause();
+}
+
+function greet(name){
+  document.getElementById("greet").innerText = name ? `Welcome ${name} 💖` : "";
+}
+
+function petals(){
+  for(let i=0;i<12;i++){
+    let p=document.createElement('div');
+    p.className='petal';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDuration=(Math.random()*6+10)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),16000);
+  }
+  setTimeout(petals,3500);
+}
+
+function submitRSVP(){
+  const name = document.getElementById('name').value;
+  const mobile = document.getElementById('mobile').value;
+
+  document.getElementById('qrWrap').style.display='block';
+  document.getElementById('qrCode').src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(location.href)}`;
+
+  const msg = `Thank you ${name} 💖\nYou are invited to our wedding!\nLocation: Udaipur\nDate: 12 Dec 2026\n\nSee Invitation:\n${location.href}`;
+
+  setTimeout(()=>{
+    window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`,'_blank');
+  },800);
+
+  return false;
+}
+</script>
+
+</body>
+</html>

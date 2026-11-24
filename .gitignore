@@ -1,0 +1,5 @@
+.env
+/config/.env
+/vendor
+/node_modules
+.claude/
