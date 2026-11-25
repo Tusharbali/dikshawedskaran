@@ -893,7 +893,7 @@ footer{padding:56px 20px 44px;}
   <small>With love &amp; gratitude</small>
 </footer>
 
-<audio id="mantraAudio" preload="auto"><source src="photos/mantra.mp3" type="audio/mpeg"></audio>
+<audio id="mantraAudio" preload="auto"><source src="photos/mantra.mp3?v=3" type="audio/mpeg"></audio>
 <audio id="bgMusic" loop><source src="wedding_song.mp3" type="audio/mpeg"></audio>
 <button class="music vinyl" id="musicBtn" onclick="toggleMusic()" aria-label="Play or pause our song">
   <span class="m-label" id="mLabel">&#9834; Our Song</span>
@@ -925,6 +925,7 @@ function endVideo(){
   setTimeout(revealSite,500);
 }
 function openInvite(){
+  unlockSong();
   if(!hasVideo||iv.error){revealSite();return;}
   ivWrap.classList.add('show');
   iv.currentTime=0;iv.muted=false;
@@ -964,7 +965,7 @@ function fade(a,to,ms,done){
     if(i>=steps){clearInterval(fadeT[a.id]);if(done)done();}},50);
 }
 function mantraOK(){return !mantra.error&&mantra.networkState!==HTMLMediaElement.NETWORK_NO_SOURCE;}
-function playTrack(a,vol){a.volume=0;return a.play().then(()=>{fade(a,vol,1200);return true;}).catch(()=>false);}
+function playTrack(a,vol){a.muted=false;a.volume=0;return a.play().then(()=>{fade(a,vol,1200);return true;}).catch(()=>false);}
 function pickVoice(){
   const vs=speechSynthesis.getVoices();
   return vs.find(v=>/^hi[-_]IN/i.test(v.lang)&&/natural|neural|madhur|swara|google/i.test(v.name))
@@ -988,10 +989,23 @@ function startVoice(){
   say(0);musicBtn.classList.add('hint');setTimeout(()=>musicBtn.classList.remove('hint'),3500);
   return true;
 }
+function armRetry(){                  // browser blocked autoplay -> start the song on the very next touch/click/scroll
+  const ev=['pointerdown','keydown','touchstart','wheel'];
+  const cleanup=()=>ev.forEach(e=>removeEventListener(e,go));
+  const go=()=>{if(muted||!bgMusic.paused){cleanup();return;}playTrack(bgMusic,.5).then(ok=>{if(ok)cleanup();});};
+  ev.forEach(e=>addEventListener(e,go,{passive:true}));
+  musicBtn.classList.add('hint');
+}
+function playSong(){if(bgMusic.paused)playTrack(bgMusic,.5).then(ok=>{if(!ok)armRetry();});}
+function unlockSong(){                // inside the first click: let the browser allow the song to start later by itself
+  if(bgMusic._u)return;bgMusic._u=true;bgMusic.muted=true;
+  const p=bgMusic.play();
+  if(p&&p.then)p.then(()=>{if(bgMusic.muted){bgMusic.pause();bgMusic.currentTime=0;bgMusic.muted=false;}}).catch(()=>{bgMusic.muted=false;});
+}
 function mantraFinished(){            // mantra over -> start the wedding song right away
   if(mantraDone)return;mantraDone=true;
   if(!started||muted)return;
-  if(bgMusic.paused)playTrack(bgMusic,.5);
+  playSong();
 }
 function startBlessing(){
   if(mantraOK()){playTrack(mantra,.7).then(ok=>{if(!ok&&!startVoice())playTrack(bgMusic,.5);});}
@@ -1006,7 +1020,7 @@ function switchTo(sec){
   if(!started||muted)return;
   if(sec==='hero'){
     mantraDone=true;stopVoice();fade(mantra,0,1200,()=>mantra.pause());
-    if(bgMusic.paused)playTrack(bgMusic,.5);
+    playSong();
   }else if(!mantraDone){                 // back on the blessing screen before the mantra has played
     fade(bgMusic,0,1200,()=>bgMusic.pause());
     startBlessing();
