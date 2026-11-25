@@ -893,7 +893,7 @@ footer{padding:56px 20px 44px;}
   <small>With love &amp; gratitude</small>
 </footer>
 
-<audio id="mantraAudio" loop preload="auto"><source src="photos/mantra.mp3" type="audio/mpeg"></audio>
+<audio id="mantraAudio" preload="auto"><source src="photos/mantra.mp3" type="audio/mpeg"></audio>
 <audio id="bgMusic" loop><source src="wedding_song.mp3" type="audio/mpeg"></audio>
 <button class="music vinyl" id="musicBtn" onclick="toggleMusic()" aria-label="Play or pause our song">
   <span class="m-label" id="mLabel">&#9834; Our Song</span>
@@ -954,7 +954,7 @@ iv.addEventListener('ended',endVideo);
 const mantra=document.getElementById('mantraAudio');          // optional: photos/mantra.mp3 (used if present)
 const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window;
 const MANTRA_LINES=['श्री गणेशाय नमः','मंगलम् भगवान विष्णु, मंगलम् गरुड़ ध्वजः','मंगलम् पुण्डरीकाक्षः, मंगलाय तनो हरि'];
-let muted=false,started=false,section='blessing',voiceRun=0,voiceActive=false,fadeT={};
+let muted=false,started=false,mantraDone=false,section='blessing',voiceRun=0,voiceActive=false,fadeT={};
 const musicBtn=document.getElementById('musicBtn');
 function anyPlaying(){return !mantra.paused||!bgMusic.paused||voiceActive;}
 function sync(){const on=anyPlaying();musicBtn.classList.toggle('playing',on);if(!on)musicBtn.classList.remove('hint');}
@@ -977,16 +977,21 @@ function startVoice(){
   const run=++voiceRun;voiceActive=true;let round=0;sync();
   const say=i=>{
     if(run!==voiceRun)return;
-    if(i>=MANTRA_LINES.length){round++;if(round>=3){voiceActive=false;sync();return;}setTimeout(()=>say(0),2500);return;}
+    if(i>=MANTRA_LINES.length){voiceActive=false;sync();mantraFinished();return;}
     const u=new SpeechSynthesisUtterance(MANTRA_LINES[i]),v=pickVoice();
     if(v){u.voice=v;u.lang=v.lang;}else u.lang='hi-IN';
     u.rate=.68;u.pitch=.85;u.volume=1;
     u.onend=()=>setTimeout(()=>say(i+1),700);
-    u.onerror=()=>{if(run===voiceRun){voiceActive=false;sync();}};
+    u.onerror=()=>{if(run===voiceRun){voiceActive=false;sync();mantraFinished();}};
     speechSynthesis.speak(u);
   };
   say(0);musicBtn.classList.add('hint');setTimeout(()=>musicBtn.classList.remove('hint'),3500);
   return true;
+}
+function mantraFinished(){            // mantra over -> start the wedding song right away
+  if(mantraDone)return;mantraDone=true;
+  if(!started||muted)return;
+  if(bgMusic.paused)playTrack(bgMusic,.5);
 }
 function startBlessing(){
   if(mantraOK()){playTrack(mantra,.7).then(ok=>{if(!ok&&!startVoice())playTrack(bgMusic,.5);});}
@@ -1000,16 +1005,16 @@ function switchTo(sec){
   if(sec===section)return;section=sec;
   if(!started||muted)return;
   if(sec==='hero'){
-    stopVoice();fade(mantra,0,1200,()=>mantra.pause());
-    playTrack(bgMusic,.5);
-  }else{
+    mantraDone=true;stopVoice();fade(mantra,0,1200,()=>mantra.pause());
+    if(bgMusic.paused)playTrack(bgMusic,.5);
+  }else if(!mantraDone){                 // back on the blessing screen before the mantra has played
     fade(bgMusic,0,1200,()=>bgMusic.pause());
     startBlessing();
   }
 }
 function toggleMusic(){
   if(anyPlaying()){muted=true;stopVoice();[mantra,bgMusic].forEach(a=>fade(a,0,400,()=>a.pause()));}
-  else{muted=false;startMusic();}
+  else{muted=false;if(mantraDone||section==='hero')playTrack(bgMusic,.5);else startMusic();started=true;}
 }
 if(canSpeak)speechSynthesis.getVoices();                       // warm up the voice list
 (function(){
@@ -1018,12 +1023,14 @@ if(canSpeak)speechSynthesis.getVoices();                       // warm up the vo
     a.addEventListener('play',()=>{sync();musicBtn.classList.add('hint');clearTimeout(t);t=setTimeout(()=>musicBtn.classList.remove('hint'),3500);});
     a.addEventListener('pause',sync);
   });
+  mantra.addEventListener('ended',()=>{sync();mantraFinished();});
+  mantra.addEventListener('error',()=>{if(started&&!muted&&section==='blessing'&&!startVoice())mantraFinished();},true);
   // switch between the two screens as the user scrolls
   const io=new IntersectionObserver(es=>es.forEach(e=>{
     if(!e.isIntersecting)return;
     if(e.target.id==='hero'){switchTo('hero');document.getElementById('writeSvg').classList.add('go');}
     else switchTo('blessing');
-  }),{threshold:.55});
+  }),{rootMargin:'-50% 0px -50% 0px',threshold:0});
   io.observe(document.getElementById('blessing'));io.observe(document.getElementById('hero'));
   window.addEventListener('pagehide',()=>{if(canSpeak)speechSynthesis.cancel();});
 })();
