@@ -957,7 +957,7 @@ const canSpeak='speechSynthesis' in window&&'SpeechSynthesisUtterance' in window
 const MANTRA_LINES=['श्री गणेशाय नमः','मंगलम् भगवान विष्णु, मंगलम् गरुड़ ध्वजः','मंगलम् पुण्डरीकाक्षः, मंगलाय तनो हरि'];
 let muted=false,started=false,mantraDone=false,section='blessing',voiceRun=0,voiceActive=false,fadeT={};
 const musicBtn=document.getElementById('musicBtn');
-function anyPlaying(){return !mantra.paused||!bgMusic.paused||voiceActive;}
+function anyPlaying(){return !mantra.paused||(!bgMusic.paused&&!bgMusic._silent)||voiceActive;}
 function sync(){const on=anyPlaying();musicBtn.classList.toggle('playing',on);if(!on)musicBtn.classList.remove('hint');}
 function fade(a,to,ms,done){
   clearInterval(fadeT[a.id]);const from=a.volume,steps=Math.max(1,ms/50);let i=0;
@@ -965,7 +965,7 @@ function fade(a,to,ms,done){
     if(i>=steps){clearInterval(fadeT[a.id]);if(done)done();}},50);
 }
 function mantraOK(){return !mantra.error&&mantra.networkState!==HTMLMediaElement.NETWORK_NO_SOURCE;}
-function playTrack(a,vol){a.muted=false;a.volume=0;return a.play().then(()=>{fade(a,vol,1200);return true;}).catch(()=>false);}
+function playTrack(a,vol){if(a._silent){a._silent=false;try{a.currentTime=0;}catch(e){}}a.muted=false;a.volume=0;return a.play().then(()=>{fade(a,vol,1200);return true;}).catch(()=>false);}
 function pickVoice(){
   const vs=speechSynthesis.getVoices();
   return vs.find(v=>/^hi[-_]IN/i.test(v.lang)&&/natural|neural|madhur|swara|google/i.test(v.name))
@@ -996,11 +996,12 @@ function armRetry(){                  // browser blocked autoplay -> start the s
   ev.forEach(e=>addEventListener(e,go,{passive:true}));
   musicBtn.classList.add('hint');
 }
-function playSong(){if(bgMusic.paused)playTrack(bgMusic,.5).then(ok=>{if(!ok)armRetry();});}
+function playSong(){if(bgMusic.paused||bgMusic._silent)playTrack(bgMusic,.5).then(ok=>{if(!ok)armRetry();});}
 function unlockSong(){                // inside the first click: let the browser allow the song to start later by itself
   if(bgMusic._u)return;bgMusic._u=true;bgMusic.muted=true;
   const p=bgMusic.play();
-  if(p&&p.then)p.then(()=>{if(bgMusic.muted){bgMusic.pause();bgMusic.currentTime=0;bgMusic.muted=false;}}).catch(()=>{bgMusic.muted=false;});
+  // keep the song running silently (muted) so it is already unlocked; it is un-muted when the mantra ends
+  if(p&&p.then)p.then(()=>{if(bgMusic.muted)bgMusic._silent=true;}).catch(()=>{bgMusic.muted=false;bgMusic._u=false;});
 }
 function mantraFinished(){            // mantra over -> start the wedding song right away
   if(mantraDone)return;mantraDone=true;
